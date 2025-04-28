@@ -33,15 +33,26 @@ HTML_PAGE = '''
     </style>
 </head>
 <body>
-    <h1>Raspberry Pi LED Control</h1>
-    <button class="led-btn" onclick="setLed('on')">
-        <img src="/green_button.png" alt="Turn LED ON">
-    </button>
-    <button class="led-btn" onclick="setLed('off')">
-        <img src="/red_button.png" alt="Turn LED OFF">
-    </button>
+    <div id="button-container"></div>
     <p id="status"></p>
     <script>
+        function renderButton(state) {
+            const container = document.getElementById('button-container');
+            if (state === 'off') {
+                container.innerHTML = `<button class=\"led-btn\" onclick=\"setLed('on')\"><img src=\"/green_button.png\" alt=\"Turn LED ON\"></button>`;
+            } else if (state === 'on') {
+                container.innerHTML = `<button class=\"led-btn\" onclick=\"setLed('off')\"><img src=\"/red_button.png\" alt=\"Turn LED OFF\"></button>`;
+            }
+        }
+
+        function fetchStateAndRender() {
+            fetch('/led')
+                .then(response => response.json())
+                .then(data => {
+                    renderButton(data.state);
+                });
+        }
+
         function setLed(state) {
             fetch('/led', {
                 method: 'POST',
@@ -51,11 +62,15 @@ HTML_PAGE = '''
             .then(response => response.json())
             .then(data => {
                 document.getElementById('status').innerText = data.status || data.error;
+                fetchStateAndRender();
             })
             .catch(error => {
                 document.getElementById('status').innerText = 'Error: ' + error;
             });
         }
+
+        // On page load
+        fetchStateAndRender();
     </script>
 </body>
 </html>
@@ -102,9 +117,19 @@ def control_led():
         save_state('off')
         return jsonify({'status': 'LED turned off'})
 
+@app.route('/led', methods=['GET'])
+def get_led_state():
+    try:
+        state = load_state() or 'off'
+        return jsonify({'state': state})
+    except Exception as e:
+        logging.exception('Error fetching LED state')
+        return jsonify({'error': f'Failed to fetch LED state: {str(e)}'}), 500
+
 @app.route('/')
 def index():
-    return render_template_string(HTML_PAGE)
+    led_state = load_state() or 'off'
+    return render_template_string(HTML_PAGE, led_state=led_state)
 
 @app.route('/green_button.png')
 def green_button():
