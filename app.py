@@ -25,10 +25,25 @@ HTML_PAGE = '''
             background: none;
             cursor: pointer;
             outline: none;
-        }
-        img {
             width: 100px;
             height: 100px;
+            border-radius: 50%;
+            font-size: 1.2em;
+            color: white;
+            font-weight: bold;
+            margin: 20px;
+            transition: box-shadow 0.2s;
+        }
+        .led-btn.green {
+            background: linear-gradient(145deg, #4caf50, #388e3c);
+            box-shadow: 0 4px 20px #4caf5077;
+        }
+        .led-btn.red {
+            background: linear-gradient(145deg, #f44336, #b71c1c);
+            box-shadow: 0 4px 20px #f4433677;
+        }
+        .led-btn:active {
+            box-shadow: 0 2px 8px #00000033;
         }
     </style>
 </head>
@@ -39,9 +54,9 @@ HTML_PAGE = '''
         function renderButton(state) {
             const container = document.getElementById('button-container');
             if (state === 'off') {
-                container.innerHTML = `<button class=\"led-btn\" onclick=\"setLed('on')\"><img src=\"/green_button.png\" alt=\"Turn LED ON\"></button>`;
+                container.innerHTML = `<button class=\"led-btn green\" onclick=\"setLed('on')\">ON</button>`;
             } else if (state === 'on') {
-                container.innerHTML = `<button class=\"led-btn\" onclick=\"setLed('off')\"><img src=\"/red_button.png\" alt=\"Turn LED OFF\"></button>`;
+                container.innerHTML = `<button class=\"led-btn red\" onclick=\"setLed('off')\">OFF</button>`;
             }
         }
 
@@ -130,14 +145,6 @@ def get_led_state():
 def index():
     led_state = load_state() or 'off'
     return render_template_string(HTML_PAGE, led_state=led_state)
-
-@app.route('/green_button.png')
-def green_button():
-    return send_from_directory('.', 'green_button.png')
-
-@app.route('/red_button.png')
-def red_button():
-    return send_from_directory('.', 'red_button.png')
 
 if __name__ == '__main__':
     try:
