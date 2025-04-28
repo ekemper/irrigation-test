@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template_string, send_from_directory
 import RPi.GPIO as GPIO
 import json
 import os
@@ -12,6 +12,54 @@ LED_PIN = 17
 STATE_FILE = 'state.json'
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(LED_PIN, GPIO.OUT)
+
+HTML_PAGE = '''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Raspberry Pi LED Control</title>
+    <style>
+        .led-btn {
+            border: none;
+            background: none;
+            cursor: pointer;
+            outline: none;
+        }
+        img {
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Raspberry Pi LED Control</h1>
+    <button class="led-btn" onclick="setLed('on')">
+        <img src="/green_button.png" alt="Turn LED ON">
+    </button>
+    <button class="led-btn" onclick="setLed('off')">
+        <img src="/red_button.png" alt="Turn LED OFF">
+    </button>
+    <p id="status"></p>
+    <script>
+        function setLed(state) {
+            fetch('/led', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ state: state })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('status').innerText = data.status || data.error;
+            })
+            .catch(error => {
+                document.getElementById('status').innerText = 'Error: ' + error;
+            });
+        }
+    </script>
+</body>
+</html>
+'''
 
 def save_state(state):
     logging.debug(f"Saving state to {STATE_FILE}: {state}")
@@ -53,6 +101,18 @@ def control_led():
         logging.info("Set GPIO LOW (LED OFF)")
         save_state('off')
         return jsonify({'status': 'LED turned off'})
+
+@app.route('/')
+def index():
+    return render_template_string(HTML_PAGE)
+
+@app.route('/green_button.png')
+def green_button():
+    return send_from_directory('.', 'green_button.png')
+
+@app.route('/red_button.png')
+def red_button():
+    return send_from_directory('.', 'red_button.png')
 
 if __name__ == '__main__':
     try:
