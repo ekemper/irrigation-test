@@ -4,19 +4,39 @@
     <meta charset="UTF-8">
     <title>Raspberry Pi LED Control</title>
     <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #f5f5f5;
+        }
+        #button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+        }
         .led-btn {
             border: none;
             background: none;
             cursor: pointer;
             outline: none;
-            width: 100px;
-            height: 100px;
             border-radius: 50%;
-            font-size: 1.2em;
+            font-size: 1.5em;
             color: white;
             font-weight: bold;
             margin: 20px;
-            transition: box-shadow 0.2s;
+            transition: box-shadow 0.2s, width 0.2s, height 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 90vw;
+            height: 90vw;
+            max-width: 350px;
+            max-height: 350px;
         }
         .led-btn.green {
             background: linear-gradient(145deg, #4caf50, #388e3c);
@@ -28,6 +48,20 @@
         }
         .led-btn:active {
             box-shadow: 0 2px 8px #00000033;
+        }
+        @media (min-width: 600px) {
+            .led-btn {
+                width: 200px;
+                height: 200px;
+                font-size: 2em;
+            }
+        }
+        @media (min-width: 900px) {
+            .led-btn {
+                width: 250px;
+                height: 250px;
+                font-size: 2.2em;
+            }
         }
     </style>
 </head>
