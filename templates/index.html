@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Raspberry Pi LED Control</title>
+    <style>
+        .led-btn {
+            border: none;
+            background: none;
+            cursor: pointer;
+            outline: none;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            font-size: 1.2em;
+            color: white;
+            font-weight: bold;
+            margin: 20px;
+            transition: box-shadow 0.2s;
+        }
+        .led-btn.green {
+            background: linear-gradient(145deg, #4caf50, #388e3c);
+            box-shadow: 0 4px 20px #4caf5077;
+        }
+        .led-btn.red {
+            background: linear-gradient(145deg, #f44336, #b71c1c);
+            box-shadow: 0 4px 20px #f4433677;
+        }
+        .led-btn:active {
+            box-shadow: 0 2px 8px #00000033;
+        }
+    </style>
+</head>
+<body>
+    <div id="button-container"></div>
+    <p id="status"></p>
+    <script src="/static/led_control.js"></script>
+</body>
+</html> 

@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template_string, send_from_directory
+from flask import Flask, request, jsonify, render_template, send_from_directory
 import RPi.GPIO as GPIO
 import json
 import os
@@ -12,84 +12,6 @@ LED_PIN = 17
 STATE_FILE = 'state.json'
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(LED_PIN, GPIO.OUT)
-
-HTML_PAGE = '''
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Raspberry Pi LED Control</title>
-    <style>
-        .led-btn {
-            border: none;
-            background: none;
-            cursor: pointer;
-            outline: none;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            font-size: 1.2em;
-            color: white;
-            font-weight: bold;
-            margin: 20px;
-            transition: box-shadow 0.2s;
-        }
-        .led-btn.green {
-            background: linear-gradient(145deg, #4caf50, #388e3c);
-            box-shadow: 0 4px 20px #4caf5077;
-        }
-        .led-btn.red {
-            background: linear-gradient(145deg, #f44336, #b71c1c);
-            box-shadow: 0 4px 20px #f4433677;
-        }
-        .led-btn:active {
-            box-shadow: 0 2px 8px #00000033;
-        }
-    </style>
-</head>
-<body>
-    <div id="button-container"></div>
-    <p id="status"></p>
-    <script>
-        function renderButton(state) {
-            const container = document.getElementById('button-container');
-            if (state === 'off') {
-                container.innerHTML = `<button class=\"led-btn green\" onclick=\"setLed('on')\">ON</button>`;
-            } else if (state === 'on') {
-                container.innerHTML = `<button class=\"led-btn red\" onclick=\"setLed('off')\">OFF</button>`;
-            }
-        }
-
-        function fetchStateAndRender() {
-            fetch('/led')
-                .then(response => response.json())
-                .then(data => {
-                    renderButton(data.state);
-                });
-        }
-
-        function setLed(state) {
-            fetch('/led', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ state: state })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('status').innerText = data.status || data.error;
-                fetchStateAndRender();
-            })
-            .catch(error => {
-                document.getElementById('status').innerText = 'Error: ' + error;
-            });
-        }
-
-        // On page load
-        fetchStateAndRender();
-    </script>
-</body>
-</html>
-'''
 
 def save_state(state):
     logging.debug(f"Saving state to {STATE_FILE}: {state}")
@@ -144,7 +66,7 @@ def get_led_state():
 @app.route('/')
 def index():
     led_state = load_state() or 'off'
-    return render_template_string(HTML_PAGE, led_state=led_state)
+    return render_template('index.html', led_state=led_state)
 
 if __name__ == '__main__':
     try:
