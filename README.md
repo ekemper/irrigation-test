@@ -30,6 +30,10 @@ Send a POST request to control the LED (GPIO 16 by default):
   curl -X POST -H "Content-Type: application/json" -d '{"state": "off"}' http://<raspberrypi-ip>:5000/led
   ```
 
+## Persistence
+- The LED state is saved in a `state.json` file whenever it is changed via the API.
+- On server startup, the last saved state is restored automatically.
+
 ## Notes
 - Change `LED_PIN` in `app.py` if you want to use a different GPIO pin.
 - Always run as root (sudo) to access GPIO. 
