@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
 
-LED_PIN = 16
+LED_PIN = 17
 STATE_FILE = 'state.json'
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(LED_PIN, GPIO.OUT)
@@ -68,4 +68,26 @@ if __name__ == '__main__':
         app.run(host='0.0.0.0', port=5000)
     finally:
         logging.info("Cleaning up GPIO on shutdown")
-        GPIO.cleanup() 
+        GPIO.cleanup()
+
+"""
+Raspberry Pi LED Control API
+
+This Flask app exposes an API to control an LED connected to GPIO 16 (BCM numbering) on a Raspberry Pi.
+
+Pinout Relationship:
+- GPIO 16 (BCM) corresponds to physical pin 36 on the Raspberry Pi header.
+- To connect an LED:
+    1. Connect the longer leg (anode, +) of the LED to GPIO 16 (physical pin 36) through a 220Ω resistor.
+    2. Connect the shorter leg (cathode, -) of the LED to a ground pin (e.g., physical pin 34 or 39).
+
+Testing High and Low Voltages:
+- When the API sets GPIO 16 HIGH, the voltage between pin 36 (GPIO 16) and GND should be ~3.3V (LED ON).
+- When the API sets GPIO 16 LOW, the voltage should be ~0V (LED OFF).
+- You can test this with a multimeter:
+    1. Place the black probe on a GND pin (e.g., pin 34 or 39).
+    2. Place the red probe on pin 36 (GPIO 16).
+    3. Use the API to toggle the LED and observe the voltage change.
+
+Refer to the official Raspberry Pi pinout diagram for more details: https://pinout.xyz/
+""" 
